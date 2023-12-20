@@ -1,0 +1,32 @@
+#!/bin/bash
+# Author: Laszlo SERDET
+
+exit=1
+
+echo -ne "[\033[1;33mTEST\033[0m] building \t\t\t"
+
+if make &> /dev/null ; [ $? -eq 0 ]; then
+    exit=0
+fi
+
+if [ $exit -eq 0 ] && [ -z "$(make | grep -w 'cc')" ]; then
+    exit=0 ; else exit=1
+fi
+
+if [ $exit -eq 0 ] && make re &> /dev/null && [ $? -eq 0 ]; then
+    exit=0 ; else exit=1
+fi
+
+if [ $exit -eq 0 ] && make clean &> /dev/null && [ $? -eq 0 ]; then
+    exit=0 ; else exit=1
+fi
+
+if [ $exit -eq 0 ] && make fclean &> /dev/null && [ $? -eq 0 ]; then
+    exit=0 ; else exit=1
+fi
+
+if [ $exit -eq 0 ]; then
+    echo -e "\033[1;32mPASSED\033[0m" ; else echo -e "\033[1;31mFAILED\033[0m"
+fi
+
+exit $exit
