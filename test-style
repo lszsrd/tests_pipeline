@@ -1,0 +1,15 @@
+#!/bin/bash
+# Author: Laszlo SERDET
+
+logs="coding-style-reports.log" ; echo -ne "[\033[1;33mTEST\033[0m] coding style \t\t\t"
+
+if make fclean &> /dev/null && coding-style . . &> /dev/null && [ $? -ne 0 ]; then
+    echo -e "\033[1;31mCRASH\033[0m" ; exit 1
+fi
+
+if cat $logs &> /dev/null && [ $? -eq 0 ] && [ -z "$(cat $logs)" ]; then
+    echo -e "\033[1;32mPASSED\033[0m" ; rm -f $logs ; exit 0
+else
+    echo -e "\033[1;31mFAILED\033[0m" ; rm -f $logs ; exit 1
+fi
+
