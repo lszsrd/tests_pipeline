@@ -19,7 +19,11 @@ fi
 vg_errors=$(cat $path | grep "contexts" | cut -d' ' -f4)
 vg_contexts=$(cat $path | grep "contexts" | cut -d' ' -f7)
 
-if [ $vg_errors -ne 0 ] && [ $vg_contexts -ne 0 ] || [ -z "$(cat $path | grep "no leaks are possible")" ]; then
+if [ $# -gt 0 ] && [ $1 == "full" ] && [ -z "$(cat $path | grep "no leaks are possible")" ]; then
+    echo -e "\033[1;31mFAILED\033[0m" ; cleanup ; exit 1
+fi
+
+if [ $vg_contexts -ne 0 ] || [ $vg_errors -ne 0 ]; then
     echo -e "\033[1;31mFAILED\033[0m" ; cleanup ; exit 1
 fi
 
