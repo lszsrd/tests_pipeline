@@ -1,0 +1,44 @@
+#!/bin/bash
+# Test Makefile's rules (all, re, clean, fclean, tests_run)
+
+exit=1
+
+function print_test_result {
+    if [ $exit -eq 0 ]; then
+        echo -e "\t\033[1;32mPASSED\033[0m"
+        else echo -e "\t\033[1;31mFAILED\033[0m"
+    fi
+}
+
+echo -ne "[\033[1;33mTEST\033[0m] build \t\t\t"
+if make &> /dev/null ; [ $? -eq 0 ]; then
+    exit=0
+fi
+print_test_result
+
+echo -ne "[\033[1;33mTEST\033[0m] no relink \t\t"
+make SHELL='sh -v' &> relink_lookup
+if [ $exit -eq 0 ] && [ -z "$(cat relink_lookup | grep -w 'cc')" ]; then
+    exit=0 ; else exit=1
+fi
+rm relink_lookup ; print_test_result
+
+echo -ne "[\033[1;33mTEST\033[0m] rebuild \t\t\t"
+if [ $exit -eq 0 ] && make re &> /dev/null && [ $? -eq 0 ]; then
+    exit=0 ; else exit=1
+fi
+print_test_result
+
+echo -ne "[\033[1;33mTEST\033[0m] clean \t\t\t"
+if [ $exit -eq 0 ] && make clean &> /dev/null && [ $? -eq 0 ]; then
+    exit=0 ; else exit=1
+fi
+print_test_result
+
+echo -ne "[\033[1;33mTEST\033[0m] fclean \t\t\t"
+if [ $exit -eq 0 ] && make fclean &> /dev/null && [ $? -eq 0 ]; then
+    exit=0 ; else exit=1
+fi
+print_test_result
+
+exit $exit

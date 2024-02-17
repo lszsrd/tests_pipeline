@@ -1,21 +1,22 @@
 #!/bin/bash
-# Author: Laszlo SERDET
+# Runs valgrind
 
-binary="my_feur" ; args="lol"
+binary="echo 'ls' | ./mysh" ; args=""
 
-command=("./"$binary" "$args)
+command=($binary" "$args)
 vg_errors=1 ; vg_contexts=1 ; signal=0 ; path="valgrind-logs"
+
+function cleanup { rm -rf $path vg_errors ; make fclean &> /dev/null ; }
 
 echo -ne "[\033[1;33mTEST\033[0m] valgrind \t\t\t" ;
 if make &> /dev/null ; [ $? -gt 0 ]; then
-    echo -e "\033[1;31mFAILED\033[0m" ; exit 1
+    echo -e "\033[1;31mBUILD ERROR\033[0m" ; cleanup ; exit 1
 fi
 
-function cleanup { rm -rf $path vg_errors ; make fclean &> /dev/null ; }
 function child { return $(valgrind $command &> $path) ; } ; child &> /dev/null ; signal=$?
 
 if [ $signal -eq 127 ]; then
-    echo -e "\033[1;31mABORTED\033[0m" ; exit 127
+    echo -e "\033[1;31mNOT INSTALLED\033[0m" ; cleanup ; exit 127
 fi
 
 if [ $signal -gt 128 ]; then
@@ -25,7 +26,7 @@ fi
 vg_errors=$(cat $path | grep "errors " | cut -d' ' -f4)
 vg_contexts=$(cat $path | grep "contexts" | cut -d' ' -f7)
 
-if [ $# -gt 0 ] && [ $1 == "full" ] && [ -z "$(cat $path | grep "no leaks are possible")" ]; then
+if [ $# -gt 0 ] && [ -z "$(cat $path | grep "no leaks are possible")" ]; then
     echo -e "\033[1;31mFAILED\033[0m" ; cleanup ; exit 1
 fi
 

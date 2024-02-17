@@ -1,0 +1,21 @@
+#!/bin/bash
+# Runs criterions tests and look for any failled/crashed tests
+
+path="criterion-logs"
+
+function cleanup { rm -rf $path ; make fclean &> /dev/null ; }
+
+echo -ne "[\033[1;33mTEST\033[0m] criterion \t\t\t" ;
+if make tests_run &> $path ; [ $? -gt 0 ]; then
+    echo -e "\033[1;31mBUILD ERROR\033[0m" ; cleanup ; exit 1
+fi
+
+if [ "$(cat $path | grep "Synthesis" | cut -d' ' -f13)" -ne 0 ]; then
+    echo -e "\033[1;31mCRASH\033[0m" ; cleanup ; exit 127
+fi
+
+if [ "$(cat $path | grep "Synthesis" | cut -d' ' -f10)" -ne 0 ]; then
+    echo -e "\033[1;31mFAILED\033[0m" ; cleanup ; exit 1
+fi
+
+echo -e "\033[1;32mPASSED\033[0m" ; cleanup ; exit 0

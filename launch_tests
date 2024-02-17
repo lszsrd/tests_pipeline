@@ -1,8 +1,0 @@
-#!/bin/bash
-./tests/bash/test-build
-
-if [ $? -eq 0 ]; then
-    ./tests/bash/test-style
-    if [ $# -gt 0 ] && [ $1 == "full" ]; then ./tests/bash/test-valgrind full
-    else ./tests/bash/test-valgrind ; fi
-fi

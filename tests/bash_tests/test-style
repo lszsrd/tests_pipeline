@@ -1,5 +1,5 @@
 #!/bin/bash
-# Author: Laszlo SERDET
+# Checks coding style
 
 logs="coding-style-reports.log" ; echo -ne "[\033[1;33mTEST\033[0m] coding style \t\t\t"
 
@@ -9,7 +9,7 @@ fi
 
 function child { return $(coding-style . . &> /dev/null) ; } ; child &> /dev/null ; signal=$?
 
-if [ $signal -eq 127 ]; then
+if [ $signal -gt 1 ]; then
     echo -e "\033[1;31mABORTED\033[0m" ; exit 127
 fi
 

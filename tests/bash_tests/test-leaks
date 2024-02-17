@@ -1,0 +1,26 @@
+#!/bin/bash
+# Runs leaks command (MacOS)
+
+binary="echo 'ls' | ./mysh" ; args=""
+
+command=("./"$binary" "$args)
+signal=0 ; path="leaks-logs"
+
+function cleanup { rm -rf $path ; make fclean &> /dev/null ; }
+
+echo -ne "[\033[1;33mTEST\033[0m] leaks \t\t\t\t" ;
+if make &> /dev/null ; [ $? -gt 0 ]; then
+    echo -e "\033[1;31mBUILD ERROR\033[0m" ; cleanup ; exit 1
+fi
+
+function child { return $(leaks -atExit -- $command &> $path) ; } ; child &> /dev/null ; signal=$?
+
+if [ $signal -eq 127 ]; then
+    echo -e "\033[1;31mNOT INSTALLED\033[0m" ; cleanup ; exit 127
+fi
+
+if [ ! -z "$(cat $path | grep "LEAK")" ]; then
+    echo -e "\033[1;31mFAILED\033[0m" ; cleanup ; exit 1
+fi
+
+echo -e "\033[1;32mPASSED\033[0m" ; cleanup ; exit 0

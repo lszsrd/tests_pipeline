@@ -1,0 +1,18 @@
+#!/bin/bash
+
+./tests/bash_tests/test-build ; exit=$?
+if [ $exit -ne 0 ]; then exit $exit ; fi
+
+./tests/bash_tests/test-style ; exit=$?
+if [ $exit -ne 0 ]; then exit $exit ; fi
+
+./tests/bash_tests/test-criterion ; exit=$?
+if [ $exit -ne 0 ]; then exit $exit ; fi
+
+if [ ! -z "$(env | grep "apple")" ]; then
+    ./tests/bash_tests/test-leaks ; exit=$?
+    if [ $exit -ne 0 ]; then exit $exit ; fi
+else
+    ./tests/bash_tests/test-valgrind ; exit=$?
+    if [ $exit -ne 0 ]; then exit $exit ; fi
+fi
